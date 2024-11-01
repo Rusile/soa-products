@@ -1,9 +1,11 @@
 package ru.itmo.products.dao.impl
 
 import jakarta.enterprise.context.ApplicationScoped
+import jakarta.transaction.Transactional
 import org.jooq.DSLContext
 import org.jooq.Field
 import org.jooq.SQLDialect
+import org.jooq.SelectFieldOrAsterisk
 import org.jooq.conf.Settings
 import org.jooq.impl.DSL
 import org.jooq.impl.DSL.noCondition
@@ -38,28 +40,14 @@ open class ProductDaoImpl : ProductDao {
             )
     }
 
+    @Transactional
     override fun <T : Any> fetchProducts(
         page: Int,
         size: Int,
         sortBy: Set<Field<*>>,
         filters: Map<Field<T>, T>,
     ): List<Product> {
-        val query = dsl.select(
-            PRODUCTS.ID,
-            PRODUCTS.NAME,
-            PRODUCTS.COORDINATE_X,
-            PRODUCTS.COORDINATE_Y,
-            PRODUCTS.CREATION_DATE,
-            PRODUCTS.PRICE,
-            PRODUCTS.PART_NUMBER,
-            PRODUCTS.UNIT_OF_MEASURE,
-            PERSONS.ID,
-            PERSONS.NAME,
-            PERSONS.WEIGHT,
-            PERSONS.BIRTHDATE,
-            PERSONS.EYE_COLOR,
-            PERSONS.HAIR_COLOR
-        ).from(
+        val query = dsl.select(ALL_FIELDS).from(
             PRODUCTS.leftJoin(PERSONS).on(PRODUCTS.PERSON_ID.eq(PERSONS.ID))
         )
         var condition = noCondition()
@@ -78,7 +66,38 @@ open class ProductDaoImpl : ProductDao {
             .fetch().map { it.toProduct() }
     }
 
+    @Transactional
     override fun countProducts(): Int {
         return dsl.fetchCount(dsl.selectFrom(PRODUCTS))
+    }
+
+    @Transactional
+    override fun getProductById(id: Long): Product? {
+        return dsl.select(ALL_FIELDS)
+            .from(
+                PRODUCTS.leftJoin(PERSONS).on(PRODUCTS.PERSON_ID.eq(PERSONS.ID))
+            )
+            .where(PRODUCTS.ID.eq(id))
+            .fetchOne()
+            ?.map { it.toProduct() }
+    }
+
+    companion object {
+        private val ALL_FIELDS: Set<SelectFieldOrAsterisk> = setOf(
+            PRODUCTS.ID,
+            PRODUCTS.NAME,
+            PRODUCTS.COORDINATE_X,
+            PRODUCTS.COORDINATE_Y,
+            PRODUCTS.CREATION_DATE,
+            PRODUCTS.PRICE,
+            PRODUCTS.PART_NUMBER,
+            PRODUCTS.UNIT_OF_MEASURE,
+            PERSONS.ID,
+            PERSONS.NAME,
+            PERSONS.WEIGHT,
+            PERSONS.BIRTHDATE,
+            PERSONS.EYE_COLOR,
+            PERSONS.HAIR_COLOR
+        )
     }
 }

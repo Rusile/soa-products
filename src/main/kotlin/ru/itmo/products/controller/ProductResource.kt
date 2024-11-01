@@ -32,4 +32,12 @@ open class ProductResource {
         return Response.ok(productsPage).build()
     }
 
+    @Path("/{id}")
+    @GET
+    open fun getProductById(@PathParam("id") id: Long): Response {
+        val result = productService.getProductById(id)
+            ?: return Response.status(Response.Status.NOT_FOUND).build()
+
+        return Response.ok(result).build()
+    }
 }

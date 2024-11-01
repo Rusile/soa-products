@@ -12,4 +12,6 @@ interface ProductDao {
     ): List<Product>
 
     fun countProducts(): Int
+
+    fun getProductById(id: Long): Product?
 }

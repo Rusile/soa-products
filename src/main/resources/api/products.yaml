@@ -1,0 +1,352 @@
+openapi: 3.0.3
+info:
+  title: Products collection api
+  version: 1.0.0
+servers:
+  - url: http://localhost:6678/api
+    description: Development server
+paths:
+  /products:
+    get:
+      summary: Get all products with sorting, filtering and pagination support
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: sortBy
+          in: query
+          description: Fields for sort
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/FieldType'
+        - name: filter
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - id
+                - name
+                - coordinates.x
+                - coordinates.y
+                - creationDate
+                - price
+                - part_number
+                - unit_of_measure
+                - owner.name
+                - owner.birthday
+                - owner.weight
+                - owner.eye_color
+                - owner.hair_color
+                - -id
+                - -name
+                - -coordinates.x
+                - -coordinates.y
+                - -creationDate
+                - -price
+                - -part_number
+                - -unit_of_measure
+                - -owner.name
+                - -owner.birthday
+                - -owner.weight
+                - -owner.eye_color
+                - -owner.hair_color
+      responses:
+        200:
+          description: Products collection
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageProduct'
+        400:
+          description: Incorrect pagination parameters
+
+    post:
+      summary: Create new product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        200:
+          description: Product successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        400:
+          description: Product validation vailed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+  /products/{id}:
+    get:
+      summary: Get product by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: Product found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        400:
+          description: Product validation vailed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        404:
+          description: Product not found
+
+    put:
+      summary: Update product by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        200:
+          description: Продукт успешно обновлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        404:
+          description: Продукт не найден
+        400:
+          description: Product validation vailed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+    delete:
+      summary: Delete product by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        204:
+          description: Product deleted
+        404:
+          description: Product not found
+        400:
+          description: Product validation vailed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+  /products/unit-of-measure/{unit-of-measure}:
+    delete:
+      summary: Delete one product by unitOfMeasure
+      parameters:
+        - name: unitOfMeasure
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [ KILOGRAMS, METERS, LITERS ]
+      responses:
+        200:
+          description: Unit deleted
+        404:
+          description: Unit not found
+        400:
+          description: Unit validation vailed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+  /products/min-price:
+    get:
+      summary: Get first product with min price
+      responses:
+        200:
+          description: Product with min price
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        404:
+          description: Unit with min price was not found or determined
+
+
+  /products/search:
+    get:
+      summary: Search products by name substring
+      parameters:
+        - name: substring
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Products Collection
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        404:
+          description: Product with such substring was not found
+
+components:
+  schemas:
+    Product:
+      type: object
+      required:
+        - name
+        - coordinates
+        - creationDate
+        - price
+        - partNumber
+        - unitOfMeasure
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+        coordinates:
+          $ref: '#/components/schemas/Coordinates'
+        creationDate:
+          type: string
+          format: date-time
+          readOnly: true
+        price:
+          type: number
+          format: float
+          minimum: 0
+        partNumber:
+          type: string
+          minLength: 17
+          maxLength: 40
+        unitOfMeasure:
+          type: string
+          enum: [ KILOGRAMS, METERS, LITERS ]
+        owner:
+          $ref: '#/components/schemas/Person'
+
+    Coordinates:
+      type: object
+      required:
+        - x
+        - y
+      properties:
+        x:
+          type: number
+          format: float
+        y:
+          type: integer
+          format: int64
+          minimum: -109
+
+    Person:
+      type: object
+      required:
+        - name
+        - weight
+        - hairColor
+      properties:
+        name:
+          type: string
+        birthday:
+          type: string
+          format: date
+        weight:
+          type: number
+          format: float
+          minimum: 0
+        eyeColor:
+          type: string
+          enum: [ RED, BLACK, YELLOW, ORANGE, WHITE ]
+        hairColor:
+          type: string
+          enum: [ RED, BLACK, BLUE, YELLOW ]
+
+    PageProduct:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+        pageable:
+          type: object
+          properties:
+            pageNumber:
+              type: integer
+            pageSize:
+              type: integer
+        totalPages:
+          type: integer
+        totalElements:
+          type: integer
+
+    ValidationError:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          readOnly: true
+
+    FieldType:
+      enum:
+        - ID
+        - NAME
+        - COORDINATES_X
+        - COORDINATES_Y
+        - CREATION_DATE
+        - PRICE
+        - PART_NUMBER
+        - UNIT_OF_MEASURE
+        - OWNER_NAME
+        - OWNER_BIRTHDAY
+        - OWNER_WEIGHT
+        - OWNER_EYE_COLOR
+        - OWNER_HAIR_COLOR
+
