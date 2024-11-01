@@ -32,40 +32,14 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/FieldType'
-        - name: filter
-          in: query
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-              enum:
-                - id
-                - name
-                - coordinates.x
-                - coordinates.y
-                - creationDate
-                - price
-                - part_number
-                - unit_of_measure
-                - owner.name
-                - owner.birthday
-                - owner.weight
-                - owner.eye_color
-                - owner.hair_color
-                - -id
-                - -name
-                - -coordinates.x
-                - -coordinates.y
-                - -creationDate
-                - -price
-                - -part_number
-                - -unit_of_measure
-                - -owner.name
-                - -owner.birthday
-                - -owner.weight
-                - -owner.eye_color
-                - -owner.hair_color
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Filter'
       responses:
         200:
           description: Products collection
@@ -350,3 +324,14 @@ components:
         - OWNER_EYE_COLOR
         - OWNER_HAIR_COLOR
 
+    Filter:
+      type: object
+      required:
+        - value
+        - fieldType
+      properties:
+        value:
+          type: string
+          minLength: 1
+        fieldType:
+          $ref: '#/components/schemas/FieldType'
