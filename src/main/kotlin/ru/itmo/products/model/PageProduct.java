@@ -1,5 +1,6 @@
 package ru.itmo.products.model;
 
+import jakarta.json.bind.annotation.JsonbCreator;
 import jakarta.json.bind.annotation.JsonbProperty;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public class PageProduct {
     @JsonbProperty("totalElements")
     private final int totalElements;
 
+    @JsonbCreator
     public PageProduct(List<Product> content, Pageable pageable, int totalPages, int totalElements) {
         this.content = content;
         this.pageable = pageable;
@@ -38,5 +40,15 @@ public class PageProduct {
 
     public int getTotalElements() {
         return totalElements;
+    }
+
+    @Override
+    public String toString() {
+        return "PageProduct{" +
+                "content=" + content +
+                ", pageable=" + pageable +
+                ", totalPages=" + totalPages +
+                ", totalElements=" + totalElements +
+                '}';
     }
 }
