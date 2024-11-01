@@ -29,7 +29,7 @@ object MapUtils {
         }
     }
 
-    fun getGetValueByTableField(field: Field<*>, value: String): Any? {
+    fun getGetValueByTableField(field: Field<*>, value: String): Any {
         return try {
             when (field) {
                 PRODUCTS.ID -> value.toLongOrNull()
@@ -49,6 +49,6 @@ object MapUtils {
             }
         } catch (e: Exception) {
             throw IncorrectFilterException("Incorrect value for some filter")
-        }
+        } ?:  throw IncorrectFilterException("Incorrect value for some filter")
     }
 }
