@@ -62,21 +62,20 @@ open class ProductDaoImpl : ProductDao {
         ).from(
             PRODUCTS.leftJoin(PERSONS).on(PRODUCTS.PERSON_ID.eq(PERSONS.ID))
         )
-        val condition = noCondition()
+        var condition = noCondition()
 
         filters.entries.forEach {
-            condition.and(it.key.eq(it.value))
+            condition = condition.and(it.key.eq(it.value))
         }
 
         sortBy.forEach {
             query.orderBy(it)
         }
 
-        query.where(condition)
-
-        query.limit(size).offset(page * size)
-
-        return query.fetch().map { it.toProduct() }
+        return query.where(condition)
+            .limit(size)
+            .offset(page * size)
+            .fetch().map { it.toProduct() }
     }
 
     override fun countProducts(): Int {
