@@ -40,4 +40,12 @@ open class ProductResource {
 
         return Response.ok(result).build()
     }
+
+    @Path("/{id}")
+    @DELETE
+    open fun deleteProductById(@PathParam("id") id: Long): Response {
+        productService.deleteProductById(id)
+
+        return Response.ok().build()
+    }
 }

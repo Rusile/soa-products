@@ -9,6 +9,7 @@ import org.jooq.SelectFieldOrAsterisk
 import org.jooq.conf.Settings
 import org.jooq.impl.DSL
 import org.jooq.impl.DSL.noCondition
+import org.jooq.impl.DSL.selectOne
 import org.jooq.impl.DefaultConfiguration
 import org.jooq.impl.DefaultConnectionProvider
 import ru.itmo.products.dao.ProductDao
@@ -80,6 +81,19 @@ open class ProductDaoImpl : ProductDao {
             .where(PRODUCTS.ID.eq(id))
             .fetchOne()
             ?.map { it.toProduct() }
+    }
+
+    @Transactional
+    override fun deleteProductById(id: Long) {
+        dsl.deleteFrom(PRODUCTS).where(PRODUCTS.ID.eq(id)).execute()
+    }
+
+    @Transactional
+    override fun existsById(id: Long): Boolean {
+        return dsl.fetchExists(
+            selectOne().from(PRODUCTS)
+                .where(PRODUCTS.ID.eq(id))
+        )
     }
 
     companion object {

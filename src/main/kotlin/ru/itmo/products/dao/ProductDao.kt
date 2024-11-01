@@ -14,4 +14,8 @@ interface ProductDao {
     fun countProducts(): Int
 
     fun getProductById(id: Long): Product?
+
+    fun deleteProductById(id: Long)
+
+    fun existsById(id: Long): Boolean
 }

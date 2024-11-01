@@ -5,6 +5,7 @@ import jakarta.inject.Inject
 import jakarta.transaction.Transactional
 import org.jooq.Field
 import ru.itmo.products.dao.ProductDao
+import ru.itmo.products.exception.EntityNotFoundException
 import ru.itmo.products.model.*
 import ru.itmo.products.service.ProductService
 import ru.itmo.products.util.MapUtils.getGetValueByTableField
@@ -44,6 +45,14 @@ constructor(
 
     override fun getProductById(id: Long): Product? {
         return productDao.getProductById(id)
+    }
+
+    @Transactional
+    override fun deleteProductById(id: Long) {
+        if (!productDao.existsById(id)) {
+            throw EntityNotFoundException("Product with id $id not found")
+        }
+        productDao.deleteProductById(id)
     }
 
     private fun parseSortBy(sortBy: List<FieldType>): Set<Field<*>> {

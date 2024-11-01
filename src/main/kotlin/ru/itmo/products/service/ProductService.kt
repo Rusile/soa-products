@@ -14,4 +14,6 @@ interface ProductService {
     ): PageProduct
 
     fun getProductById(id: Long): Product?
+
+    fun deleteProductById(id: Long)
 }
