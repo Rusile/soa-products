@@ -1,9 +1,6 @@
 package ru.itmo.products.service
 
-import ru.itmo.products.model.FieldType
-import ru.itmo.products.model.Filter
-import ru.itmo.products.model.PageProduct
-import ru.itmo.products.model.Product
+import ru.itmo.products.model.*
 
 interface ProductService {
     fun getProducts(
@@ -16,4 +13,14 @@ interface ProductService {
     fun getProductById(id: Long): Product?
 
     fun deleteProductById(id: Long)
+
+    fun deleteOneProductByUnitOfMeasure(unitOfMeasure: UnitOfMeasure)
+
+    fun getProductWithMinPrice(): Product?
+
+    fun findProductsBySubstring(substring: String): List<Product>
+
+    fun createProduct(product: Product): Product
+
+    fun updateProduct(product: Product): Product
 }

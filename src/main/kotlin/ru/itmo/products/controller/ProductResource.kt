@@ -1,11 +1,17 @@
 package ru.itmo.products.controller
 
 import jakarta.inject.Inject
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
+import ru.itmo.products.exception.EntityNotFoundException
 import ru.itmo.products.model.FieldType
 import ru.itmo.products.model.Filter
+import ru.itmo.products.model.Product
+import ru.itmo.products.model.UnitOfMeasure
 import ru.itmo.products.service.ProductService
 
 @Path("/products")
@@ -32,6 +38,12 @@ open class ProductResource {
         return Response.ok(productsPage).build()
     }
 
+    @POST
+    open fun createProduct(@Valid product: Product): Response {
+        val createdProduct = productService.createProduct(product)
+        return Response.ok(createdProduct).build()
+    }
+
     @Path("/{id}")
     @GET
     open fun getProductById(@PathParam("id") id: Long): Response {
@@ -47,5 +59,38 @@ open class ProductResource {
         productService.deleteProductById(id)
 
         return Response.ok().build()
+    }
+
+    @Path("/{id}")
+    @PUT
+    open fun updateProductById(@PathParam("id") id: Long, @Valid product: Product): Response {
+        product.id = id
+        val result = productService.updateProduct(product)
+        return Response.ok(result).build()
+    }
+
+    @Path("/unit-of-measure/{unit-of-measure}")
+    @DELETE
+    open fun deleteByUnitOfMeasure(@PathParam("unit-of-measure") unitOfMeasure: UnitOfMeasure): Response {
+        productService.deleteOneProductByUnitOfMeasure(unitOfMeasure)
+        return Response.ok().build()
+    }
+
+    @Path("/min-price")
+    @GET
+    open fun getProductWithMinPrice(): Response {
+        val result = productService.getProductWithMinPrice()
+            ?: throw EntityNotFoundException("No products were found")
+        return Response.ok(result).build()
+    }
+
+    @Path("/search")
+    @GET
+    open fun findProductsBySubstring(@QueryParam("substring") @NotNull @NotBlank substring: String): Response {
+        val result = productService.findProductsBySubstring(substring)
+        if (result.isEmpty()) {
+            throw EntityNotFoundException("No products contain such substring")
+        }
+        return Response.ok(result).build()
     }
 }

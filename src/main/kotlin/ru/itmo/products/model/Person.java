@@ -2,30 +2,39 @@ package ru.itmo.products.model;
 
 import jakarta.json.bind.annotation.JsonbCreator;
 import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 public class Person {
     @JsonbProperty("id")
     private Long id;
 
     @JsonbProperty("name")
-    private String name; // Field cannot be null, String cannot be empty
+    @NotNull(message = "Name cannot be null")
+    @NotEmpty(message = "Name cannot be empty")
+    private String name;
 
     @JsonbProperty("birthday")
-    private OffsetDateTime birthday; // Field can be null
+    private LocalDateTime birthday;
 
     @JsonbProperty("weight")
-    private Double weight; // Field value must be greater than 0
+    @NotNull(message = "Weight cannot be null")
+    @Positive(message = "Weight must be greater than 0")
+    private Double weight;
 
     @JsonbProperty("eyeColor")
-    private Color eyeColor; // Field can be null
+    private Color eyeColor;
 
     @JsonbProperty("hairColor")
-    private Color hairColor; // Field cannot be null
+    @NotNull(message = "Hair color cannot be null")
+    private Color hairColor;
+
 
     @JsonbCreator
-    public Person(Long id, String name, OffsetDateTime birthday, Double weight, Color eyeColor, Color hairColor) {
+    public Person(Long id, String name, LocalDateTime birthday, Double weight, Color eyeColor, Color hairColor) {
         this.id = id;
         this.name = name;
         this.birthday = birthday;
@@ -50,11 +59,11 @@ public class Person {
         this.name = name;
     }
 
-    public OffsetDateTime getBirthday() {
+    public LocalDateTime getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(OffsetDateTime birthday) {
+    public void setBirthday(LocalDateTime birthday) {
         this.birthday = birthday;
     }
 

@@ -26,5 +26,4 @@ class CustomExceptionMapper: ExceptionMapper<RuntimeException> {
             .entity(ErrorResponse(e.message))
             .build();
     }
-
 }

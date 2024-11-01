@@ -15,9 +15,13 @@ import org.jooq.impl.DefaultConnectionProvider
 import ru.itmo.products.dao.ProductDao
 import ru.itmo.products.generated.jooq.Tables.PERSONS
 import ru.itmo.products.generated.jooq.Tables.PRODUCTS
+import ru.itmo.products.mapper.Mappers.toPerson
 import ru.itmo.products.mapper.Mappers.toProduct
+import ru.itmo.products.model.Person
 import ru.itmo.products.model.Product
+import ru.itmo.products.model.UnitOfMeasure
 import java.sql.DriverManager.getConnection
+import java.time.LocalDateTime
 
 
 @ApplicationScoped
@@ -46,7 +50,7 @@ open class ProductDaoImpl : ProductDao {
         page: Int,
         size: Int,
         sortBy: Set<Field<*>>,
-        filters: Map<Field<T>, T>,
+        filters: Map<Field<T>, T>
     ): List<Product> {
         val query = dsl.select(ALL_FIELDS).from(
             PRODUCTS.leftJoin(PERSONS).on(PRODUCTS.PERSON_ID.eq(PERSONS.ID))
@@ -94,6 +98,99 @@ open class ProductDaoImpl : ProductDao {
             selectOne().from(PRODUCTS)
                 .where(PRODUCTS.ID.eq(id))
         )
+    }
+
+    @Transactional
+    override fun deleteOneProductByUnitOfMeasure(unitOfMeasure: UnitOfMeasure) {
+        dsl.deleteFrom(PRODUCTS)
+            .where(PRODUCTS.UNIT_OF_MEASURE.eq(unitOfMeasure.name))
+            .limit(1)
+            .execute()
+    }
+
+    @Transactional
+    override fun getProductWithMinPrice(): Product? {
+        return dsl.select(ALL_FIELDS)
+            .from(PRODUCTS.leftJoin(PERSONS).on(PRODUCTS.PERSON_ID.eq(PERSONS.ID)))
+            .orderBy(PRODUCTS.UNIT_OF_MEASURE.desc())
+            .limit(1)
+            .fetchOne()
+            ?.map { it.toProduct() }
+    }
+
+    @Transactional
+    override fun findProductsBySubstring(substring: String): List<Product> {
+        return dsl.select(ALL_FIELDS)
+            .from(PRODUCTS.leftJoin(PERSONS).on(PRODUCTS.PERSON_ID.eq(PERSONS.ID)))
+            .where(PRODUCTS.NAME.contains(substring))
+            .fetch()
+            .map { it.toProduct() }
+    }
+
+    @Transactional
+    override fun insertProduct(product: Product): Product {
+        val owner: Person? = product.owner
+
+        val persistedOwner = if (owner != null) {
+                 dsl.insertInto(PERSONS)
+                .set(PERSONS.WEIGHT, owner.weight)
+                .set(PERSONS.NAME, owner.name)
+                .set(PERSONS.BIRTHDATE, owner.birthday)
+                .set(PERSONS.EYE_COLOR, owner.eyeColor?.name)
+                .set(PERSONS.HAIR_COLOR, owner.hairColor.name)
+                .returning()
+                .fetchOne()
+                ?.toPerson() ?: error("Person with name ${product.owner.name} could not be inserted")
+        } else null
+
+        val persistedProduct = dsl.insertInto(PRODUCTS)
+            .set(PRODUCTS.NAME, product.name)
+            .set(PRODUCTS.PERSON_ID, persistedOwner?.id)
+            .set(PRODUCTS.PRICE, product.price)
+            .set(PRODUCTS.PART_NUMBER, product.partNumber)
+            .set(PRODUCTS.UNIT_OF_MEASURE, product.unitOfMeasure.name)
+            .set(PRODUCTS.CREATION_DATE, LocalDateTime.now())
+            .set(PRODUCTS.COORDINATE_X, product.coordinates.x)
+            .set(PRODUCTS.COORDINATE_Y, product.coordinates.y)
+            .returning()
+            .fetchOne()
+            ?.toProduct() ?: error("Product with name ${product.name} could not be inserted")
+
+        persistedProduct.owner = persistedOwner
+        return persistedProduct
+    }
+
+    @Transactional
+    override fun updateProduct(product: Product): Product {
+        val owner: Person? = product.owner
+
+        val persistedOwner = if (owner != null) {
+            dsl.update(PERSONS)
+                .set(PERSONS.WEIGHT, owner.weight)
+                .set(PERSONS.NAME, owner.name)
+                .set(PERSONS.BIRTHDATE, owner.birthday)
+                .set(PERSONS.EYE_COLOR, owner.eyeColor?.name)
+                .set(PERSONS.HAIR_COLOR, owner.hairColor.name)
+                .returning()
+                .fetchOne()
+                ?.toPerson() ?: error("Person with name ${product.owner.name} could not be updated")
+        } else null
+
+        val persistedProduct = dsl.update(PRODUCTS)
+            .set(PRODUCTS.NAME, product.name)
+            .set(PRODUCTS.PERSON_ID, persistedOwner?.id)
+            .set(PRODUCTS.PRICE, product.price)
+            .set(PRODUCTS.PART_NUMBER, product.partNumber)
+            .set(PRODUCTS.UNIT_OF_MEASURE, product.unitOfMeasure.name)
+            .set(PRODUCTS.CREATION_DATE, LocalDateTime.now())
+            .set(PRODUCTS.COORDINATE_X, product.coordinates.x)
+            .set(PRODUCTS.COORDINATE_Y, product.coordinates.y)
+            .returning()
+            .fetchOne()
+            ?.toProduct() ?: error("Product with name ${product.name} could not be updated")
+
+        persistedProduct.owner = persistedOwner
+        return persistedProduct
     }
 
     companion object {

@@ -55,6 +55,24 @@ constructor(
         productDao.deleteProductById(id)
     }
 
+    override fun deleteOneProductByUnitOfMeasure(unitOfMeasure: UnitOfMeasure) {
+        productDao.deleteOneProductByUnitOfMeasure(unitOfMeasure)
+    }
+
+    override fun getProductWithMinPrice() = productDao.getProductWithMinPrice()
+
+    override fun findProductsBySubstring(substring: String) = productDao.findProductsBySubstring(substring)
+
+    override fun createProduct(product: Product) = productDao.insertProduct(product)
+
+    @Transactional
+    override fun updateProduct(product: Product): Product {
+        if (!productDao.existsById(product.id)) {
+            throw EntityNotFoundException("Product with id ${product.id} not found")
+        }
+        return productDao.updateProduct(product)
+    }
+
     private fun parseSortBy(sortBy: List<FieldType>): Set<Field<*>> {
         return sortBy.map {
             getProductTableFieldByCode(it)
