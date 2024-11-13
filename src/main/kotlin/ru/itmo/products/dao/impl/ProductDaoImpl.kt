@@ -35,14 +35,14 @@ open class ProductDaoImpl : ProductDao {
             "postgres"
         )
         dsl = DSL.using(
-                DefaultConfiguration()
-                    .set(DefaultConnectionProvider(c))
-                    .set(SQLDialect.POSTGRES)
-                    .set(
-                        Settings()
-                            .withExecuteLogging(false)
-                    )
-            )
+            DefaultConfiguration()
+                .set(DefaultConnectionProvider(c))
+                .set(SQLDialect.POSTGRES)
+                .set(
+                    Settings()
+                        .withExecuteLogging(false)
+                )
+        )
     }
 
     @Transactional
@@ -106,6 +106,14 @@ open class ProductDaoImpl : ProductDao {
             .where(PRODUCTS.UNIT_OF_MEASURE.eq(unitOfMeasure.name))
             .limit(1)
             .execute()
+    }
+
+    @Transactional
+    override fun existsOneProductByUnitOfMeasure(unitOfMeasure: UnitOfMeasure): Boolean {
+        return dsl.fetchExists(
+            selectOne().from(PRODUCTS)
+                .where(PRODUCTS.UNIT_OF_MEASURE.eq(unitOfMeasure.name))
+        )
     }
 
     @Transactional

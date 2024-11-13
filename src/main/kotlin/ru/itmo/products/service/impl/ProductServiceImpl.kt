@@ -6,6 +6,7 @@ import jakarta.transaction.Transactional
 import org.jooq.Field
 import ru.itmo.products.dao.ProductDao
 import ru.itmo.products.exception.EntityNotFoundException
+import ru.itmo.products.exception.InvalidInputData
 import ru.itmo.products.model.*
 import ru.itmo.products.service.ProductService
 import ru.itmo.products.util.MapUtils.getGetValueByTableField
@@ -55,7 +56,11 @@ constructor(
         productDao.deleteProductById(id)
     }
 
+    @Transactional
     override fun deleteOneProductByUnitOfMeasure(unitOfMeasure: UnitOfMeasure) {
+        if (!productDao.existsOneProductByUnitOfMeasure(unitOfMeasure)) {
+            throw EntityNotFoundException("Product with unitOfMeasure $unitOfMeasure not found")
+        }
         productDao.deleteOneProductByUnitOfMeasure(unitOfMeasure)
     }
 
@@ -69,6 +74,9 @@ constructor(
     override fun updateProduct(product: Product): Product {
         if (!productDao.existsById(product.id)) {
             throw EntityNotFoundException("Product with id ${product.id} not found")
+        }
+        if (product.owner != null && product.owner.id == null) {
+            throw InvalidInputData("Can not update product's owner with empty owner.id")
         }
         return productDao.updateProduct(product)
     }

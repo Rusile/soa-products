@@ -22,7 +22,8 @@ open class ProductResource {
     @Inject
     private lateinit var productService: ProductService
 
-    @GET
+    @Path("/bulk")
+    @POST
     open fun getProducts(
         @QueryParam("page") page: Int?,
         @QueryParam("size") size: Int?,

@@ -7,6 +7,29 @@ servers:
     description: Development server
 paths:
   /products:
+    post:
+      summary: Create new product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        200:
+          description: Product successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        400:
+          description: Product validation vailed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+  /products/bulk:
     get:
       summary: Get all products with sorting, filtering and pagination support
       parameters:
@@ -49,28 +72,6 @@ paths:
                 $ref: '#/components/schemas/PageProduct'
         400:
           description: Incorrect pagination parameters
-
-    post:
-      summary: Create new product
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Product'
-      responses:
-        200:
-          description: Product successfully created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Product'
-        400:
-          description: Product validation vailed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationError'
 
   /products/{id}:
     get:

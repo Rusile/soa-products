@@ -29,4 +29,6 @@ interface ProductDao {
     fun insertProduct(product: Product): Product
 
     fun updateProduct(product: Product): Product
+
+    fun existsOneProductByUnitOfMeasure(unitOfMeasure: UnitOfMeasure): Boolean
 }
