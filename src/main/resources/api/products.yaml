@@ -30,7 +30,7 @@ paths:
                 $ref: '#/components/schemas/Error'
 
   /products/bulk:
-    get:
+    post:
       summary: Get all products with sorting, filtering and pagination support
       parameters:
         - name: page
