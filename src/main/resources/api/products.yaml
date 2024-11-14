@@ -27,7 +27,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ErrorResponse'
 
   /products/bulk:
     post:
@@ -95,9 +95,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ErrorResponse'
         404:
           description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
     put:
       summary: Update product by id
@@ -123,12 +127,16 @@ paths:
                 $ref: '#/components/schemas/Product'
         404:
           description: Продукт не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         400:
           description: Product validation vailed
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ErrorResponse'
 
     delete:
       summary: Delete product by id
@@ -139,16 +147,20 @@ paths:
           schema:
             type: integer
       responses:
-        204:
+        200:
           description: Product deleted
         404:
           description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         400:
           description: Product validation vailed
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ErrorResponse'
 
   /products/unit-of-measure/{unit-of-measure}:
     delete:
@@ -165,12 +177,16 @@ paths:
           description: Unit deleted
         404:
           description: Unit not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         400:
           description: Unit validation vailed
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ErrorResponse'
 
   /products/min-price:
     get:
@@ -184,6 +200,10 @@ paths:
                 $ref: '#/components/schemas/Product'
         404:
           description: Unit with min price was not found or determined
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
 
   /products/search:
@@ -206,6 +226,10 @@ paths:
                   $ref: '#/components/schemas/Product'
         404:
           description: Product with such substring was not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
 components:
   schemas:
@@ -300,7 +324,7 @@ components:
         totalElements:
           type: integer
 
-    Error:
+    ErrorResponse:
       type: object
       required:
         - cause
