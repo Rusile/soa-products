@@ -28,7 +28,7 @@ open class ProductResource {
         @QueryParam("page") page: Int?,
         @QueryParam("size") size: Int?,
         @QueryParam("sortBy") sortBy: List<FieldType>?,
-        filter: List<Filter>?
+        @Valid filter: List<Filter>?
     ): Response {
         val productsPage = productService.getProducts(
             page ?: 0,

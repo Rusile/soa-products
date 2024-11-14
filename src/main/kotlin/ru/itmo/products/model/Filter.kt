@@ -11,5 +11,6 @@ constructor(
     @NotNull
     val fieldType: FieldType,
     @JsonbProperty("value")
+    @NotNull
     val value: String
 )
