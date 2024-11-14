@@ -4,6 +4,7 @@ import jakarta.inject.Inject
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Positive
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
@@ -25,8 +26,8 @@ open class ProductResource {
     @Path("/bulk")
     @POST
     open fun getProducts(
-        @QueryParam("page") page: Int?,
-        @QueryParam("size") size: Int?,
+        @Valid @Positive @QueryParam("page") page: Int?,
+        @Valid @Positive @QueryParam("size") size: Int?,
         @QueryParam("sortBy") sortBy: List<FieldType>?,
         @Valid filter: List<Filter>?
     ): Response {
