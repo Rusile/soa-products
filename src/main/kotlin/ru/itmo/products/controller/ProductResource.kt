@@ -2,9 +2,9 @@ package ru.itmo.products.controller
 
 import jakarta.inject.Inject
 import jakarta.validation.Valid
+import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
-import jakarta.validation.constraints.Positive
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
@@ -26,15 +26,15 @@ open class ProductResource {
     @Path("/bulk")
     @POST
     open fun getProducts(
-        @Valid @Positive @QueryParam("page") page: Int?,
-        @Valid @Positive @QueryParam("size") size: Int?,
+        @Valid @Min(0) @QueryParam("page") page: Int?,
+        @Valid @Min(0) @QueryParam("size") size: Int?,
         @QueryParam("sortBy") sortBy: List<FieldType>?,
         @Valid filter: List<Filter>?
     ): Response {
         val productsPage = productService.getProducts(
             page ?: 0,
             size ?: 10,
-            sortBy ?: emptyList(),
+            sortBy ?: listOf(FieldType.ID),
             filter ?: emptyList(),
         )
         return Response.ok(productsPage).build()

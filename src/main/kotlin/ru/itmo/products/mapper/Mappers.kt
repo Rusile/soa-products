@@ -14,7 +14,7 @@ object Mappers {
             this[PERSONS.BIRTHDATE],
             this[PERSONS.WEIGHT],
             this[PERSONS.EYE_COLOR]?.let { Color.valueOf(it) },
-            this[PERSONS.EYE_COLOR].let { Color.valueOf(it) }
+            this[PERSONS.HAIR_COLOR].let { Color.valueOf(it) }
         )
     }
 

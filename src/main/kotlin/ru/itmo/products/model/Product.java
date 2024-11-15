@@ -1,5 +1,7 @@
 package ru.itmo.products.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.json.bind.annotation.JsonbCreator;
 import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.validation.Valid;
@@ -7,6 +9,8 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+import ru.itmo.products.util.CustomDateDeserializer;
+import ru.itmo.products.util.CustomDateSerializer;
 
 import java.time.LocalDateTime;
 
@@ -24,6 +28,8 @@ public class Product {
     private Coordinates coordinates;
 
     @JsonbProperty("creationDate")
+    @JsonDeserialize(using = CustomDateDeserializer.class)
+    @JsonSerialize(using = CustomDateSerializer.class)
     private LocalDateTime creationDate;
 
     @JsonbProperty("price")
@@ -42,6 +48,10 @@ public class Product {
     @Valid
     @JsonbProperty("owner")
     private Person owner;
+
+    public Product() {
+
+    }
 
     @JsonbCreator
     public Product(Long id, String name, Coordinates coordinates, LocalDateTime creationDate, double price, String partNumber, UnitOfMeasure unitOfMeasure, Person owner) {

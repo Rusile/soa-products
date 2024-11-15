@@ -6,7 +6,11 @@ import jakarta.json.bind.annotation.JsonbProperty;
 public class ErrorResponse {
 
     @JsonbProperty("cause")
-    private final String cause;
+    private String cause;
+
+    public ErrorResponse() {
+
+    }
 
     @JsonbCreator
     public ErrorResponse(String cause) {

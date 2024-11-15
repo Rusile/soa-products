@@ -7,9 +7,7 @@ import org.jooq.Field
 import org.jooq.SQLDialect
 import org.jooq.SelectFieldOrAsterisk
 import org.jooq.conf.Settings
-import org.jooq.impl.DSL
-import org.jooq.impl.DSL.noCondition
-import org.jooq.impl.DSL.selectOne
+import org.jooq.impl.DSL.*
 import org.jooq.impl.DefaultConfiguration
 import org.jooq.impl.DefaultConnectionProvider
 import ru.itmo.products.dao.ProductDao
@@ -34,7 +32,7 @@ open class ProductDaoImpl : ProductDao {
             "postgres",
             "postgres"
         )
-        dsl = DSL.using(
+        dsl = using(
             DefaultConfiguration()
                 .set(DefaultConnectionProvider(c))
                 .set(SQLDialect.POSTGRES)
@@ -120,7 +118,7 @@ open class ProductDaoImpl : ProductDao {
     override fun getProductWithMinPrice(): Product? {
         return dsl.select(ALL_FIELDS)
             .from(PRODUCTS.leftJoin(PERSONS).on(PRODUCTS.PERSON_ID.eq(PERSONS.ID)))
-            .orderBy(PRODUCTS.UNIT_OF_MEASURE.desc())
+            .orderBy(PRODUCTS.PRICE.desc())
             .limit(1)
             .fetchOne()
             ?.map { it.toProduct() }
@@ -130,7 +128,7 @@ open class ProductDaoImpl : ProductDao {
     override fun findProductsBySubstring(substring: String): List<Product> {
         return dsl.select(ALL_FIELDS)
             .from(PRODUCTS.leftJoin(PERSONS).on(PRODUCTS.PERSON_ID.eq(PERSONS.ID)))
-            .where(PRODUCTS.NAME.contains(substring))
+            .where(lower(PRODUCTS.NAME).contains(substring.lowercase()))
             .fetch()
             .map { it.toProduct() }
     }
@@ -191,7 +189,6 @@ open class ProductDaoImpl : ProductDao {
             .set(PRODUCTS.PRICE, product.price)
             .set(PRODUCTS.PART_NUMBER, product.partNumber)
             .set(PRODUCTS.UNIT_OF_MEASURE, product.unitOfMeasure.name)
-            .set(PRODUCTS.CREATION_DATE, LocalDateTime.now())
             .set(PRODUCTS.COORDINATE_X, product.coordinates.x)
             .set(PRODUCTS.COORDINATE_Y, product.coordinates.y)
             .where(PRODUCTS.ID.eq(product.id))

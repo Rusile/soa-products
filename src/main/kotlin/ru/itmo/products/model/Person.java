@@ -1,10 +1,14 @@
 package ru.itmo.products.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.json.bind.annotation.JsonbCreator;
 import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import ru.itmo.products.util.CustomDateDeserializer;
+import ru.itmo.products.util.CustomDateSerializer;
 
 import java.time.LocalDateTime;
 
@@ -18,6 +22,8 @@ public class Person {
     private String name;
 
     @JsonbProperty("birthday")
+    @JsonDeserialize(using = CustomDateDeserializer.class)
+    @JsonSerialize(using = CustomDateSerializer.class)
     private LocalDateTime birthday;
 
     @JsonbProperty("weight")
@@ -32,6 +38,7 @@ public class Person {
     @NotNull(message = "Hair color cannot be null")
     private Color hairColor;
 
+    public Person() {}
 
     @JsonbCreator
     public Person(Long id, String name, LocalDateTime birthday, Double weight, Color eyeColor, Color hairColor) {
