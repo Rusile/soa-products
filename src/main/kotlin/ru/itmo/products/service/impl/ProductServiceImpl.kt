@@ -75,6 +75,12 @@ constructor(
         if (!productDao.existsById(product.id)) {
             throw EntityNotFoundException("Product with id ${product.id} not found")
         }
+        val persisted = productDao.getProductById(product.id)!!
+
+        if (persisted.owner == null) {
+            product.owner = null
+        }
+
         if (product.owner != null && product.owner.id == null) {
             throw InvalidInputData("Can not update product's owner with empty owner.id")
         }

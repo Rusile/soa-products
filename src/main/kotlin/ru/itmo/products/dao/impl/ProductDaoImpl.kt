@@ -118,7 +118,7 @@ open class ProductDaoImpl : ProductDao {
     override fun getProductWithMinPrice(): Product? {
         return dsl.select(ALL_FIELDS)
             .from(PRODUCTS.leftJoin(PERSONS).on(PRODUCTS.PERSON_ID.eq(PERSONS.ID)))
-            .orderBy(PRODUCTS.PRICE.desc())
+            .orderBy(PRODUCTS.PRICE.asc())
             .limit(1)
             .fetchOne()
             ?.map { it.toProduct() }
