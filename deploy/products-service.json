@@ -1,0 +1,13 @@
+{
+  "service": {
+    "name": "products",
+    "id": "products",
+    "address": "188.225.56.32",
+    "port": 8023,
+    "tags": ["primary"]
+  },
+  "check": {
+    "http": "http://localhost:8023/products-1.0-SNAPSHOT/api/ping",
+    "interval": "10s"
+  }
+}

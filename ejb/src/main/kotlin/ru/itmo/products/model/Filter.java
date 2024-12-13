@@ -4,7 +4,9 @@ import jakarta.json.bind.annotation.JsonbCreator;
 import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.validation.constraints.NotNull;
 
-public class Filter {
+import java.io.Serializable;
+
+public class Filter implements Serializable {
 
     @JsonbProperty("fieldType")
     @NotNull

@@ -12,9 +12,10 @@ import jakarta.validation.constraints.Size;
 import ru.itmo.products.util.CustomDateDeserializer;
 import ru.itmo.products.util.CustomDateSerializer;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class Product {
+public class Product implements Serializable {
     @JsonbProperty("id")
     private Long id;
 

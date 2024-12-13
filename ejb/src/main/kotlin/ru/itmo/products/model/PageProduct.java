@@ -3,9 +3,10 @@ package ru.itmo.products.model;
 import jakarta.json.bind.annotation.JsonbCreator;
 import jakarta.json.bind.annotation.JsonbProperty;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class PageProduct {
+public class PageProduct implements Serializable {
     @JsonbProperty("content")
     private final List<Product> content;
 

@@ -11,20 +11,22 @@ import ru.itmo.products.model.ErrorResponse
 @Provider
 class CustomExceptionMapper: ExceptionMapper<RuntimeException> {
     override fun toResponse(e: RuntimeException): Response {
-        if (e is EntityNotFoundException) {
+        val cause = e.cause
+        if (e is EntityNotFoundException || cause is EntityNotFoundException) {
             return Response.status(404)
-                .entity(ErrorResponse(e.message))
+                .entity(ErrorResponse(cause?.message ?: e.message))
                 .build()
         }
 
-        if (e is IncorrectFilterException || e is InvalidInputData) {
+        if (e is IncorrectFilterException || e is InvalidInputData
+            || cause is IncorrectFilterException || cause is InvalidInputData) {
             return Response.status(400)
-                .entity(ErrorResponse(e.message))
+                .entity(ErrorResponse(cause?.message ?: e.message))
                 .build()
         }
 
         return Response.status(500)
-            .entity(ErrorResponse(e.message))
+            .entity(ErrorResponse(cause?.message ?: e.message))
             .build()
     }
 }

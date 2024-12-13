@@ -13,7 +13,6 @@ import jakarta.ws.rs.ext.Provider
 @PreMatching
 open class CorsFilter : ContainerRequestFilter, ContainerResponseFilter {
     override fun filter(request: ContainerRequestContext) {
-
         // best practise is "костыль" development
         request.headers["Content-Type"] = listOf("application/json")
 
